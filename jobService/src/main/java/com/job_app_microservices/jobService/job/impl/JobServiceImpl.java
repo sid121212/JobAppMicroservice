@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import com.job_app_microservices.jobService.job.Job;
 import com.job_app_microservices.jobService.job.JobRepository;
 import com.job_app_microservices.jobService.job.JobService;
+import com.job_app_microservices.jobService.job.clients.CompanyClient;
+import com.job_app_microservices.jobService.job.clients.ReviewClient;
 import com.job_app_microservices.jobService.job.dto.JobWithCompanyDTO;
 import com.job_app_microservices.jobService.job.external.Company;
 import com.job_app_microservices.jobService.job.external.Review;
@@ -26,9 +28,14 @@ public class JobServiceImpl implements JobService{
 	@Autowired
 	RestTemplate restTemplate;
 	
-	public JobServiceImpl(JobRepository jobRepo) {
+	private CompanyClient companyClient;
+	private ReviewClient reviewClient;
+	
+	public JobServiceImpl(JobRepository jobRepo,CompanyClient companyClient,ReviewClient reviewClient) {
 		super();
 		this.jobRepo = jobRepo;
+		this.companyClient = companyClient;
+		this.reviewClient = reviewClient;
 	}
 
 	
@@ -58,12 +65,12 @@ public class JobServiceImpl implements JobService{
 	private JobWithCompanyDTO convertToDTO(Job job) {
 		JobWithCompanyDTO jobWithCompanyDTO = new JobWithCompanyDTO();
 		jobWithCompanyDTO.setJob(job);
-		String url = "http://companyService:8081/company/"+job.getCompanyId();
-		String url2 = "http://reviewService:8083/reviews?companyId="+job.getCompanyId();
+//		String url = "http://companyService:8081/company/"+job.getCompanyId();
+//		String url2 = "http://reviewService:8083/reviews?companyId="+job.getCompanyId();
 //		System.out.println(url2);
-		Company company = restTemplate.getForObject(url, Company.class);
-		Review[] reviewsArray = restTemplate.getForObject(url2, Review[].class);
-		List<Review> reviews = Arrays.asList(reviewsArray);
+		Company company = companyClient.getCompany(job.getId());
+//		Review[] reviewsArray = restTemplate.getForObject(url2, Review[].class);
+		List<Review> reviews = reviewClient.getAllReviews(job.getCompanyId());
 		jobWithCompanyDTO.setCompany(company);
 		jobWithCompanyDTO.setReview(reviews);
 		return jobWithCompanyDTO;
