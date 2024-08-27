@@ -1,6 +1,7 @@
 package com.job_app_microservices.jobService.job.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import com.job_app_microservices.jobService.job.JobRepository;
 import com.job_app_microservices.jobService.job.JobService;
 import com.job_app_microservices.jobService.job.dto.JobWithCompanyDTO;
 import com.job_app_microservices.jobService.job.external.Company;
+import com.job_app_microservices.jobService.job.external.Review;
 
 
 
@@ -57,8 +59,13 @@ public class JobServiceImpl implements JobService{
 		JobWithCompanyDTO jobWithCompanyDTO = new JobWithCompanyDTO();
 		jobWithCompanyDTO.setJob(job);
 		String url = "http://companyService:8081/company/"+job.getCompanyId();
+		String url2 = "http://reviewService:8083/reviews?companyId="+job.getCompanyId();
+//		System.out.println(url2);
 		Company company = restTemplate.getForObject(url, Company.class);
+		Review[] reviewsArray = restTemplate.getForObject(url2, Review[].class);
+		List<Review> reviews = Arrays.asList(reviewsArray);
 		jobWithCompanyDTO.setCompany(company);
+		jobWithCompanyDTO.setReview(reviews);
 		return jobWithCompanyDTO;
 	}
 
