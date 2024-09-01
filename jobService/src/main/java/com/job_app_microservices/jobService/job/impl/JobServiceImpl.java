@@ -1,7 +1,6 @@
 package com.job_app_microservices.jobService.job.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,8 @@ import com.job_app_microservices.jobService.job.clients.ReviewClient;
 import com.job_app_microservices.jobService.job.dto.JobWithCompanyDTO;
 import com.job_app_microservices.jobService.job.external.Company;
 import com.job_app_microservices.jobService.job.external.Review;
+
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 
 
@@ -41,6 +42,7 @@ public class JobServiceImpl implements JobService{
 	
 	
 	@Override
+	@RateLimiter(name = "companyBreaker")
 	public List<JobWithCompanyDTO> findAll() {
 		
 		List<Job> jobs = jobRepo.findAll();
