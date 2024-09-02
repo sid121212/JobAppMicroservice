@@ -1,6 +1,13 @@
-
-
 services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # RabbitMQ default port
+      - "15672:15672"
+    networks:
+      - postgres
+
   postgres:
     container_name: postgres_container
     image: postgres
@@ -19,7 +26,7 @@ services:
   pgadmin:
     container_name: pgadmin_container
     image: dpage/pgadmin4
-    environment: 
+    environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
